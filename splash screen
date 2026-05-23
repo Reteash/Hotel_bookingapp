@@ -1,0 +1,208 @@
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  Dimensions,
+  ImageBackground,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function SplashScreen() {
+  // Fade animations for premium soft effect
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  useEffect(() => {
+    // Soft fade-in animation sequence
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1200,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <StatusBar translucent backgroundColor="transparent" barStyle="light-content" />
+      
+      <ImageBackground
+        source={{ uri: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=2400&fit=crop" }}
+        style={styles.backgroundImage}
+        imageStyle={styles.backgroundImageStyle}
+      >
+        {/* Dark overlay for luxury feel */}
+        <View style={styles.overlay} />
+        
+        {/* Centered Content */}
+        <View style={styles.contentContainer}>
+          <Animated.View
+            style={[
+              styles.logoContainer,
+              {
+                opacity: fadeAnim,
+                transform: [{ scale: scaleAnim }],
+              },
+            ]}
+          >
+            {/* App Logo / Icon */}
+            <View style={styles.logoCircle}>
+              <Text style={styles.logoIcon}>✦</Text>
+            </View>
+            
+            {/* App Name */}
+            <Text style={styles.appName}>STAYLUXE</Text>
+            
+            {/* Tagline */}
+            <Text style={styles.tagline}>Luxury stays, curated for you</Text>
+            
+            {/* Decorative Line */}
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerDot}>•</Text>
+              <View style={styles.dividerLine} />
+            </View>
+            
+            {/* Subtitle */}
+            <Text style={styles.subtitle}>Experience the finest hotels</Text>
+          </Animated.View>
+        </View>
+        
+        {/* Bottom Text */}
+        <View style={styles.bottomContainer}>
+          <Text style={styles.bottomText}>travel in style</Text>
+        </View>
+      </ImageBackground>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#000000",
+  },
+
+  backgroundImage: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+
+  backgroundImageStyle: {
+    resizeMode: "cover",
+  },
+
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.25)",
+  },
+
+  contentContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+
+  logoContainer: {
+    alignItems: "center",
+  },
+
+  logoCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "rgba(255,255,255,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+
+  logoIcon: {
+    fontSize: 48,
+    color: "#1A1A1A",
+  },
+
+  appName: {
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    letterSpacing: 4,
+    marginBottom: 12,
+    textShadowColor: "rgba(0,0,0,0.2)",
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+
+  tagline: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#F5F5F5",
+    letterSpacing: 1,
+    marginBottom: 24,
+    textShadowColor: "rgba(0,0,0,0.2)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+
+  dividerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+
+  dividerLine: {
+    width: 40,
+    height: 1,
+    backgroundColor: "rgba(255,255,255,0.5)",
+  },
+
+  dividerDot: {
+    fontSize: 8,
+    color: "rgba(255,255,255,0.7)",
+    marginHorizontal: 8,
+  },
+
+  subtitle: {
+    fontSize: 12,
+    fontWeight: "400",
+    color: "rgba(255,255,255,0.8)",
+    letterSpacing: 0.5,
+    textShadowColor: "rgba(0,0,0,0.1)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+
+  bottomContainer: {
+    position: "absolute",
+    bottom: 40,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+  },
+
+  bottomText: {
+    fontSize: 11,
+    fontWeight: "400",
+    color: "rgba(255,255,255,0.6)",
+    letterSpacing: 2,
+    textTransform: "uppercase",
+  },
+});
