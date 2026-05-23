@@ -1,0 +1,695 @@
+import { useState } from "react";
+import {
+  Dimensions,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function PaymentScreen() {
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("card");
+  const [saveCard, setSaveCard] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Booking summary data
+  const bookingSummary = {
+    hotelName: "The Grand Plaza",
+    location: "Paris, France",
+    roomType: "Deluxe King Room",
+    checkIn: "March 15, 2024",
+    checkOut: "March 18, 2024",
+    nights: 3,
+    guests: 2,
+    roomPrice: 12999,
+    taxFee: 2599,
+    serviceFee: 999,
+    total: 16597,
+  };
+
+  const calculateTotal = () => {
+    return bookingSummary.roomPrice + bookingSummary.taxFee + bookingSummary.serviceFee;
+  };
+
+  const handlePayment = () => {
+    setIsProcessing(true);
+    setTimeout(() => {
+      setIsProcessing(false);
+      console.log("Payment Successful");
+    }, 2000);
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton}>
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Payment</Text>
+        <View style={styles.placeholder} />
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Booking Summary Card */}
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>Booking Summary</Text>
+          
+          <View style={styles.hotelInfo}>
+            <Text style={styles.hotelName}>{bookingSummary.hotelName}</Text>
+            <View style={styles.locationRow}>
+              <Text style={styles.locationIcon}>📍</Text>
+              <Text style={styles.locationText}>{bookingSummary.location}</Text>
+            </View>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.roomInfo}>
+            <Text style={styles.roomType}>{bookingSummary.roomType}</Text>
+            <View style={styles.guestsRow}>
+              <Text style={styles.guestIcon}>👥</Text>
+              <Text style={styles.guestText}>{bookingSummary.guests} Guests</Text>
+            </View>
+          </View>
+
+          <View style={styles.dateContainer}>
+            <View style={styles.dateItem}>
+              <Text style={styles.dateLabel}>Check-in</Text>
+              <Text style={styles.dateValue}>{bookingSummary.checkIn}</Text>
+            </View>
+            <View style={styles.dateArrow}>→</View>
+            <View style={styles.dateItem}>
+              <Text style={styles.dateLabel}>Check-out</Text>
+              <Text style={styles.dateValue}>{bookingSummary.checkOut}</Text>
+            </View>
+          </View>
+
+          <View style={styles.nightsBadge}>
+            <Text style={styles.nightsText}>{bookingSummary.nights} Nights</Text>
+          </View>
+
+          <View style={styles.priceBreakdown}>
+            <View style={styles.priceRow}>
+              <Text style={styles.priceLabel}>Room Charges</Text>
+              <Text style={styles.priceValue}>₹{bookingSummary.roomPrice}</Text>
+            </View>
+            <View style={styles.priceRow}>
+              <Text style={styles.priceLabel}>Taxes & Fees</Text>
+              <Text style={styles.priceValue}>₹{bookingSummary.taxFee}</Text>
+            </View>
+            <View style={styles.priceRow}>
+              <Text style={styles.priceLabel}>Service Fee</Text>
+              <Text style={styles.priceValue}>₹{bookingSummary.serviceFee}</Text>
+            </View>
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Total Amount</Text>
+              <Text style={styles.totalValue}>₹{calculateTotal()}</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Payment Methods */}
+        <Text style={styles.paymentTitle}>Select Payment Method</Text>
+
+        {/* UPI Option */}
+        <TouchableOpacity
+          style={[
+            styles.paymentMethodCard,
+            selectedPaymentMethod === "upi" && styles.paymentMethodSelected,
+          ]}
+          onPress={() => setSelectedPaymentMethod("upi")}
+        >
+          <View style={styles.paymentMethodLeft}>
+            <View style={styles.paymentIconContainer}>
+              <Text style={styles.paymentIcon}>📱</Text>
+            </View>
+            <View>
+              <Text style={styles.paymentMethodName}>UPI</Text>
+              <Text style={styles.paymentMethodDesc}>Google Pay, PhonePe, Paytm</Text>
+            </View>
+          </View>
+          <View style={[styles.radioButton, selectedPaymentMethod === "upi" && styles.radioButtonSelected]} />
+        </TouchableOpacity>
+
+        {/* Card Option */}
+        <TouchableOpacity
+          style={[
+            styles.paymentMethodCard,
+            selectedPaymentMethod === "card" && styles.paymentMethodSelected,
+          ]}
+          onPress={() => setSelectedPaymentMethod("card")}
+        >
+          <View style={styles.paymentMethodLeft}>
+            <View style={styles.paymentIconContainer}>
+              <Text style={styles.paymentIcon}>💳</Text>
+            </View>
+            <View>
+              <Text style={styles.paymentMethodName}>Credit / Debit Card</Text>
+              <Text style={styles.paymentMethodDesc}>Visa, Mastercard, RuPay</Text>
+            </View>
+          </View>
+          <View style={[styles.radioButton, selectedPaymentMethod === "card" && styles.radioButtonSelected]} />
+        </TouchableOpacity>
+
+        {/* Card Details Form (shown when card is selected) */}
+        {selectedPaymentMethod === "card" && (
+          <View style={styles.cardForm}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Card Number</Text>
+              <TextInput
+                style={styles.cardInput}
+                placeholder="1234 5678 9012 3456"
+                placeholderTextColor="#A0A0A0"
+                keyboardType="numeric"
+              />
+            </View>
+
+            <View style={styles.rowInputs}>
+              <View style={[styles.inputGroup, { flex: 1, marginRight: 12 }]}>
+                <Text style={styles.inputLabel}>Expiry Date</Text>
+                <TextInput
+                  style={styles.cardInput}
+                  placeholder="MM/YY"
+                  placeholderTextColor="#A0A0A0"
+                  keyboardType="numeric"
+                />
+              </View>
+              <View style={[styles.inputGroup, { flex: 1 }]}>
+                <Text style={styles.inputLabel}>CVV</Text>
+                <TextInput
+                  style={styles.cardInput}
+                  placeholder="123"
+                  placeholderTextColor="#A0A0A0"
+                  keyboardType="numeric"
+                  secureTextEntry
+                />
+              </View>
+            </View>
+
+            <TouchableOpacity style={styles.saveCardRow} onPress={() => setSaveCard(!saveCard)}>
+              <View style={[styles.checkbox, saveCard && styles.checkboxChecked]}>
+                {saveCard && <Text style={styles.checkmark}>✓</Text>}
+              </View>
+              <Text style={styles.saveCardText}>Save card for future bookings</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* UPI Options (shown when UPI is selected) */}
+        {selectedPaymentMethod === "upi" && (
+          <View style={styles.upiOptions}>
+            <TouchableOpacity style={styles.upiApp}>
+              <Text style={styles.upiAppIcon}>📱</Text>
+              <Text style={styles.upiAppName}>Google Pay</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.upiApp}>
+              <Text style={styles.upiAppIcon}>📱</Text>
+              <Text style={styles.upiAppName}>PhonePe</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.upiApp}>
+              <Text style={styles.upiAppIcon}>📱</Text>
+              <Text style={styles.upiAppName}>Paytm</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Security Note */}
+        <View style={styles.securityNote}>
+          <Text style={styles.securityIcon}>🔒</Text>
+          <Text style={styles.securityText}>
+            Your payment information is secure and encrypted
+          </Text>
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+
+      {/* Pay Now Button */}
+      <View style={styles.payButtonContainer}>
+        <TouchableOpacity
+          style={[styles.payButton, isProcessing && styles.payButtonProcessing]}
+          onPress={handlePayment}
+          disabled={isProcessing}
+        >
+          <Text style={styles.payButtonText}>
+            {isProcessing ? "Processing..." : `Pay ₹${calculateTotal()}`}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  // Header
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
+    backgroundColor: "#FAFAFA",
+  },
+
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  backIcon: {
+    fontSize: 24,
+    color: "#1A1A1A",
+  },
+
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1A1A1A",
+  },
+
+  placeholder: {
+    width: 44,
+  },
+
+  // Booking Summary Card
+  summaryCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 24,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+
+  summaryTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 16,
+  },
+
+  hotelInfo: {
+    marginBottom: 12,
+  },
+
+  hotelName: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 4,
+  },
+
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  locationIcon: {
+    fontSize: 12,
+    marginRight: 4,
+  },
+
+  locationText: {
+    fontSize: 13,
+    color: "#666666",
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: "#E5E5E5",
+    marginVertical: 12,
+  },
+
+  roomInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  roomType: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1A1A1A",
+  },
+
+  guestsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  guestIcon: {
+    fontSize: 12,
+    marginRight: 4,
+  },
+
+  guestText: {
+    fontSize: 13,
+    color: "#666666",
+  },
+
+  dateContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  dateItem: {
+    flex: 1,
+  },
+
+  dateLabel: {
+    fontSize: 11,
+    color: "#999999",
+    marginBottom: 4,
+  },
+
+  dateValue: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#1A1A1A",
+  },
+
+  dateArrow: {
+    fontSize: 16,
+    color: "#CCCCCC",
+    marginHorizontal: 16,
+  },
+
+  nightsBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+
+  nightsText: {
+    fontSize: 11,
+    color: "#666666",
+    fontWeight: "500",
+  },
+
+  priceBreakdown: {
+    borderTopWidth: 1,
+    borderTopColor: "#E5E5E5",
+    paddingTop: 12,
+  },
+
+  priceRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+
+  priceLabel: {
+    fontSize: 13,
+    color: "#666666",
+  },
+
+  priceValue: {
+    fontSize: 13,
+    color: "#1A1A1A",
+    fontWeight: "500",
+  },
+
+  totalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: "#E5E5E5",
+  },
+
+  totalLabel: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#1A1A1A",
+  },
+
+  totalValue: {
+    fontSize: 18,
+    fontWeight: "800",
+    color: "#1A1A1A",
+  },
+
+  // Payment Methods
+  paymentTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginHorizontal: 20,
+    marginBottom: 12,
+  },
+
+  paymentMethodCard: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    marginHorizontal: 20,
+    marginBottom: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+  },
+
+  paymentMethodSelected: {
+    borderColor: "#1A1A1A",
+    borderWidth: 2,
+  },
+
+  paymentMethodLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  paymentIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#F5F5F5",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 12,
+  },
+
+  paymentIcon: {
+    fontSize: 24,
+  },
+
+  paymentMethodName: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginBottom: 2,
+  },
+
+  paymentMethodDesc: {
+    fontSize: 11,
+    color: "#999999",
+  },
+
+  radioButton: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: "#CCCCCC",
+  },
+
+  radioButtonSelected: {
+    borderColor: "#1A1A1A",
+    backgroundColor: "#1A1A1A",
+  },
+
+  // Card Form
+  cardForm: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    marginHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 16,
+    padding: 16,
+  },
+
+  inputGroup: {
+    marginBottom: 16,
+  },
+
+  inputLabel: {
+    fontSize: 12,
+    fontWeight: "500",
+    color: "#666666",
+    marginBottom: 6,
+  },
+
+  cardInput: {
+    backgroundColor: "#F5F5F5",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 14,
+    color: "#1A1A1A",
+  },
+
+  rowInputs: {
+    flexDirection: "row",
+    marginBottom: 16,
+  },
+
+  saveCardRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: "#CCCCCC",
+    marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  checkboxChecked: {
+    backgroundColor: "#1A1A1A",
+    borderColor: "#1A1A1A",
+  },
+
+  checkmark: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
+  saveCardText: {
+    fontSize: 13,
+    color: "#666666",
+  },
+
+  // UPI Options
+  upiOptions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+
+  upiApp: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+  },
+
+  upiAppIcon: {
+    fontSize: 24,
+    marginBottom: 6,
+  },
+
+  upiAppName: {
+    fontSize: 11,
+    color: "#666666",
+    fontWeight: "500",
+  },
+
+  // Security Note
+  securityNote: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 24,
+  },
+
+  securityIcon: {
+    fontSize: 14,
+    marginRight: 8,
+  },
+
+  securityText: {
+    fontSize: 11,
+    color: "#999999",
+  },
+
+  // Pay Button
+  payButtonContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#E5E5E5",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+
+  payButton: {
+    backgroundColor: "#1A1A1A",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+
+  payButtonProcessing: {
+    opacity: 0.7,
+  },
+
+  payButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+
+  bottomSpacer: {
+    height: 100,
+  },
+});
