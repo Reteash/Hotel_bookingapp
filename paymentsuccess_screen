@@ -1,0 +1,458 @@
+import React, { useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  StatusBar,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  Animated,
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function PaymentSuccessScreen() {
+  // Animation values
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  // Booking confirmation data
+  const bookingDetails = {
+    bookingId: "LUX" + Math.floor(Math.random() * 1000000),
+    hotelName: "The Grand Plaza",
+    location: "Paris, France",
+    roomType: "Deluxe King Room",
+    checkIn: "March 15, 2024",
+    checkOut: "March 18, 2024",
+    nights: 3,
+    guests: 2,
+    totalAmount: "₹16,597",
+    status: "Confirmed",
+    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
+  };
+
+  useEffect(() => {
+    // Success animation sequence
+    Animated.sequence([
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 6,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  const handleContinue = () => {
+    console.log("Navigate to Bookings");
+  };
+
+  const handleViewBooking = () => {
+    console.log("View Booking Details");
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+
+      <View style={styles.contentContainer}>
+        {/* Success Animation */}
+        <Animated.View
+          style={[
+            styles.successIconContainer,
+            {
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        >
+          <View style={styles.successCircle}>
+            <Text style={styles.successIcon}>✓</Text>
+          </View>
+        </Animated.View>
+
+        {/* Success Text */}
+        <Animated.View style={[styles.successTextContainer, { opacity: fadeAnim }]}>
+          <Text style={styles.successTitle}>Booking Confirmed!</Text>
+          <Text style={styles.successSubtitle}>
+            Your luxury stay has been successfully booked
+          </Text>
+        </Animated.View>
+
+        {/* Booking ID Card */}
+        <Animated.View style={[styles.bookingIdCard, { opacity: fadeAnim }]}>
+          <Text style={styles.bookingIdLabel}>Booking ID</Text>
+          <Text style={styles.bookingIdValue}>{bookingDetails.bookingId}</Text>
+          <View style={styles.statusBadge}>
+            <Text style={styles.statusText}>{bookingDetails.status}</Text>
+          </View>
+        </Animated.View>
+
+        {/* Hotel Preview Card */}
+        <Animated.View style={[styles.hotelPreviewCard, { opacity: fadeAnim }]}>
+          <Image source={{ uri: bookingDetails.image }} style={styles.hotelImage} />
+          
+          <View style={styles.hotelInfo}>
+            <Text style={styles.hotelName}>{bookingDetails.hotelName}</Text>
+            <View style={styles.locationRow}>
+              <Text style={styles.locationIcon}>📍</Text>
+              <Text style={styles.locationText}>{bookingDetails.location}</Text>
+            </View>
+            
+            <View style={styles.detailsGrid}>
+              <View style={styles.detailItem}>
+                <Text style={styles.detailIcon}>🛏️</Text>
+                <Text style={styles.detailText}>{bookingDetails.roomType}</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.detailIcon}>📅</Text>
+                <Text style={styles.detailText}>{bookingDetails.nights} Nights</Text>
+              </View>
+              <View style={styles.detailItem}>
+                <Text style={styles.detailIcon}>👥</Text>
+                <Text style={styles.detailText}>{bookingDetails.guests} Guests</Text>
+              </View>
+            </View>
+
+            <View style={styles.dateContainer}>
+              <View style={styles.dateBlock}>
+                <Text style={styles.dateLabel}>Check-in</Text>
+                <Text style={styles.dateValue}>{bookingDetails.checkIn}</Text>
+                <Text style={styles.dateTime}>After 2:00 PM</Text>
+              </View>
+              <View style={styles.dateSeparator}>
+                <Text style={styles.separatorIcon}>→</Text>
+              </View>
+              <View style={styles.dateBlock}>
+                <Text style={styles.dateLabel}>Check-out</Text>
+                <Text style={styles.dateValue}>{bookingDetails.checkOut}</Text>
+                <Text style={styles.dateTime}>Before 11:00 AM</Text>
+              </View>
+            </View>
+
+            <View style={styles.totalContainer}>
+              <Text style={styles.totalLabel}>Total Paid</Text>
+              <Text style={styles.totalValue}>{bookingDetails.totalAmount}</Text>
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Action Buttons */}
+        <Animated.View style={[styles.actionContainer, { opacity: fadeAnim }]}>
+          <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
+            <Text style={styles.continueButtonText}>Continue Exploring</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.viewBookingButton} onPress={handleViewBooking}>
+            <Text style={styles.viewBookingButtonText}>View Booking Details</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Confirmation Note */}
+        <View style={styles.confirmationNote}>
+          <Text style={styles.noteIcon}>📧</Text>
+          <Text style={styles.noteText}>
+            Confirmation details have been sent to your email
+          </Text>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  contentContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+
+  // Success Icon
+  successIconContainer: {
+    alignItems: "center",
+    marginTop: 40,
+    marginBottom: 24,
+  },
+
+  successCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#10B981",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#10B981",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+
+  successIcon: {
+    fontSize: 52,
+    color: "#FFFFFF",
+    fontWeight: "700",
+  },
+
+  // Success Text
+  successTextContainer: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+
+  successTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    marginBottom: 8,
+    letterSpacing: -0.5,
+  },
+
+  successSubtitle: {
+    fontSize: 15,
+    color: "#666666",
+    textAlign: "center",
+    lineHeight: 22,
+  },
+
+  // Booking ID Card
+  bookingIdCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 20,
+    alignItems: "center",
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+
+  bookingIdLabel: {
+    fontSize: 12,
+    color: "#999999",
+    letterSpacing: 1,
+    marginBottom: 6,
+  },
+
+  bookingIdValue: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    letterSpacing: 1,
+    marginBottom: 12,
+  },
+
+  statusBadge: {
+    backgroundColor: "#10B981",
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+
+  statusText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "600",
+    letterSpacing: 0.5,
+  },
+
+  // Hotel Preview Card
+  hotelPreviewCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    overflow: "hidden",
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+
+  hotelImage: {
+    width: "100%",
+    height: 160,
+    resizeMode: "cover",
+  },
+
+  hotelInfo: {
+    padding: 18,
+  },
+
+  hotelName: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    marginBottom: 4,
+  },
+
+  locationRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+
+  locationIcon: {
+    fontSize: 12,
+    marginRight: 4,
+  },
+
+  locationText: {
+    fontSize: 13,
+    color: "#666666",
+  },
+
+  detailsGrid: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E5E5",
+  },
+
+  detailItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  detailIcon: {
+    fontSize: 14,
+    marginRight: 6,
+  },
+
+  detailText: {
+    fontSize: 13,
+    color: "#666666",
+    fontWeight: "500",
+  },
+
+  dateContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E5E5",
+  },
+
+  dateBlock: {
+    flex: 1,
+  },
+
+  dateLabel: {
+    fontSize: 11,
+    color: "#999999",
+    marginBottom: 4,
+  },
+
+  dateValue: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginBottom: 2,
+  },
+
+  dateTime: {
+    fontSize: 10,
+    color: "#999999",
+  },
+
+  dateSeparator: {
+    paddingHorizontal: 16,
+  },
+
+  separatorIcon: {
+    fontSize: 16,
+    color: "#CCCCCC",
+  },
+
+  totalContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+
+  totalLabel: {
+    fontSize: 14,
+    color: "#666666",
+    fontWeight: "500",
+  },
+
+  totalValue: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#1A1A1A",
+  },
+
+  // Action Buttons
+  actionContainer: {
+    marginBottom: 20,
+  },
+
+  continueButton: {
+    backgroundColor: "#1A1A1A",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+
+  continueButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  viewBookingButton: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+  },
+
+  viewBookingButtonText: {
+    color: "#1A1A1A",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+
+  // Confirmation Note
+  confirmationNote: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+  },
+
+  noteIcon: {
+    fontSize: 14,
+    marginRight: 8,
+  },
+
+  noteText: {
+    fontSize: 12,
+    color: "#999999",
+    textAlign: "center",
+  },
+});
