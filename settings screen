@@ -1,0 +1,445 @@
+import { useState } from "react";
+import {
+  Alert,
+  Dimensions,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function SettingsScreen() {
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [smsNotifications, setSmsNotifications] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
+
+  const settingsSections = [
+    {
+      id: "preferences",
+      title: "Preferences",
+      items: [
+        {
+          id: "notifications",
+          title: "Push Notifications",
+          subtitle: "Receive booking updates and offers",
+          type: "toggle",
+          value: notificationsEnabled,
+          onValueChange: setNotificationsEnabled,
+          icon: "🔔",
+        },
+        {
+          id: "darkmode",
+          title: "Dark Mode",
+          subtitle: "Switch to dark theme",
+          type: "toggle",
+          value: darkModeEnabled,
+          onValueChange: setDarkModeEnabled,
+          icon: "🌙",
+        },
+        {
+          id: "language",
+          title: "Language",
+          subtitle: selectedLanguage,
+          type: "select",
+          value: selectedLanguage,
+          icon: "🌐",
+          onPress: () => console.log("Select language"),
+        },
+      ],
+    },
+    {
+      id: "notifications",
+      title: "Notification Preferences",
+      items: [
+        {
+          id: "email",
+          title: "Email Notifications",
+          subtitle: "Booking confirmations and receipts",
+          type: "toggle",
+          value: emailNotifications,
+          onValueChange: setEmailNotifications,
+          icon: "📧",
+        },
+        {
+          id: "sms",
+          title: "SMS Notifications",
+          subtitle: "Important updates via text",
+          type: "toggle",
+          value: smsNotifications,
+          onValueChange: setSmsNotifications,
+          icon: "💬",
+        },
+      ],
+    },
+    {
+      id: "account",
+      title: "Account",
+      items: [
+        {
+          id: "privacy",
+          title: "Privacy Policy",
+          subtitle: "Read our privacy practices",
+          type: "link",
+          icon: "🔒",
+          onPress: () => console.log("Open Privacy Policy"),
+        },
+        {
+          id: "terms",
+          title: "Terms of Service",
+          subtitle: "Terms and conditions",
+          type: "link",
+          icon: "📜",
+          onPress: () => console.log("Open Terms"),
+        },
+        {
+          id: "logout",
+          title: "Logout",
+          subtitle: "Sign out of your account",
+          type: "logout",
+          icon: "↪",
+          onPress: () => handleLogout(),
+        },
+      ],
+    },
+  ];
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: () => {
+            console.log("User logged out");
+          },
+        },
+      ]
+    );
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "This action cannot be undone. All your data will be permanently removed.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            console.log("Account deleted");
+          },
+        },
+      ]
+    );
+  };
+
+  const renderSettingItem = (item: any) => {
+    if (item.type === "toggle") {
+      return (
+        <View style={styles.settingItem}>
+          <View style={styles.settingLeft}>
+            <Text style={styles.settingIcon}>{item.icon}</Text>
+            <View style={styles.settingTextContainer}>
+              <Text style={styles.settingTitle}>{item.title}</Text>
+              <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
+            </View>
+          </View>
+          <Switch
+            value={item.value}
+            onValueChange={item.onValueChange}
+            trackColor={{ false: "#E5E5E5", true: "#1A1A1A" }}
+            thumbColor={"#FFFFFF"}
+          />
+        </View>
+      );
+    } else if (item.type === "select") {
+      return (
+        <TouchableOpacity style={styles.settingItem} onPress={item.onPress}>
+          <View style={styles.settingLeft}>
+            <Text style={styles.settingIcon}>{item.icon}</Text>
+            <View style={styles.settingTextContainer}>
+              <Text style={styles.settingTitle}>{item.title}</Text>
+              <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
+            </View>
+          </View>
+          <View style={styles.settingRight}>
+            <Text style={styles.selectValue}>{item.value}</Text>
+            <Text style={styles.chevron}>›</Text>
+          </View>
+        </TouchableOpacity>
+      );
+    } else if (item.type === "link") {
+      return (
+        <TouchableOpacity style={styles.settingItem} onPress={item.onPress}>
+          <View style={styles.settingLeft}>
+            <Text style={styles.settingIcon}>{item.icon}</Text>
+            <View style={styles.settingTextContainer}>
+              <Text style={styles.settingTitle}>{item.title}</Text>
+              <Text style={styles.settingSubtitle}>{item.subtitle}</Text>
+            </View>
+          </View>
+          <Text style={styles.chevron}>›</Text>
+        </TouchableOpacity>
+      );
+    } else if (item.type === "logout") {
+      return (
+        <TouchableOpacity style={styles.logoutItem} onPress={item.onPress}>
+          <View style={styles.settingLeft}>
+            <Text style={styles.logoutIcon}>{item.icon}</Text>
+            <View style={styles.settingTextContainer}>
+              <Text style={styles.logoutTitle}>{item.title}</Text>
+              <Text style={styles.logoutSubtitle}>{item.subtitle}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Settings</Text>
+        <Text style={styles.headerSubtitle}>Customize your experience</Text>
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {settingsSections.map((section) => (
+          <View key={section.id} style={styles.section}>
+            <Text style={styles.sectionTitle}>{section.title}</Text>
+            <View style={styles.sectionCard}>
+              {section.items.map((item) => (
+                <View key={item.id}>{renderSettingItem(item)}</View>
+              ))}
+            </View>
+          </View>
+        ))}
+
+        {/* Delete Account Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Danger Zone</Text>
+          <View style={styles.sectionCard}>
+            <TouchableOpacity style={styles.deleteItem} onPress={handleDeleteAccount}>
+              <View style={styles.settingLeft}>
+                <Text style={styles.deleteIcon}>⚠️</Text>
+                <View style={styles.settingTextContainer}>
+                  <Text style={styles.deleteTitle}>Delete Account</Text>
+                  <Text style={styles.deleteSubtitle}>Permanently remove your account</Text>
+                </View>
+              </View>
+              <Text style={styles.chevron}>›</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* App Version */}
+        <View style={styles.versionContainer}>
+          <Text style={styles.versionText}>StayLuxe App v1.0.0</Text>
+          <Text style={styles.copyrightText}>© 2024 StayLuxe. All rights reserved.</Text>
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  // Header
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    letterSpacing: -0.5,
+    marginBottom: 4,
+  },
+
+  headerSubtitle: {
+    fontSize: 14,
+    color: "#666666",
+    fontWeight: "400",
+  },
+
+  // Section
+  section: {
+    marginTop: 24,
+    paddingHorizontal: 20,
+  },
+
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#999999",
+    letterSpacing: 0.5,
+    marginBottom: 12,
+    textTransform: "uppercase",
+  },
+
+  sectionCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  // Setting Item
+  settingItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+
+  settingLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+
+  settingIcon: {
+    fontSize: 22,
+    marginRight: 14,
+  },
+
+  settingTextContainer: {
+    flex: 1,
+  },
+
+  settingTitle: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#1A1A1A",
+    marginBottom: 2,
+  },
+
+  settingSubtitle: {
+    fontSize: 12,
+    color: "#999999",
+  },
+
+  settingRight: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  selectValue: {
+    fontSize: 14,
+    color: "#666666",
+    marginRight: 8,
+  },
+
+  chevron: {
+    fontSize: 18,
+    color: "#CCCCCC",
+    fontWeight: "500",
+  },
+
+  // Logout Item
+  logoutItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+
+  logoutIcon: {
+    fontSize: 22,
+    marginRight: 14,
+  },
+
+  logoutTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#EF4444",
+    marginBottom: 2,
+  },
+
+  logoutSubtitle: {
+    fontSize: 12,
+    color: "#999999",
+  },
+
+  // Delete Item
+  deleteItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
+
+  deleteIcon: {
+    fontSize: 22,
+    marginRight: 14,
+  },
+
+  deleteTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#EF4444",
+    marginBottom: 2,
+  },
+
+  deleteSubtitle: {
+    fontSize: 12,
+    color: "#999999",
+  },
+
+  // Version
+  versionContainer: {
+    alignItems: "center",
+    marginTop: 32,
+    marginBottom: 16,
+  },
+
+  versionText: {
+    fontSize: 12,
+    color: "#CCCCCC",
+    fontWeight: "500",
+    marginBottom: 4,
+  },
+
+  copyrightText: {
+    fontSize: 10,
+    color: "#CCCCCC",
+  },
+
+  bottomSpacer: {
+    height: 20,
+  },
+});
