@@ -1,0 +1,294 @@
+import { useState } from "react";
+import {
+  Dimensions,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function EmptyStateScreen() {
+  const [activeTab, setActiveTab] = useState("hotels");
+
+  const emptyStates = {
+    hotels: {
+      icon: "🔍",
+      title: "No hotels found",
+      message: "We couldn't find any hotels matching your search. Try adjusting your filters or explore different destinations.",
+      buttonText: "Explore All Hotels",
+      secondaryButton: "Clear Filters",
+    },
+    wishlist: {
+      icon: "🤍",
+      title: "Your wishlist is empty",
+      message: "Save your favorite hotels to see them here. Start exploring and discover your perfect stay.",
+      buttonText: "Explore Hotels",
+      secondaryButton: null,
+    },
+    bookings: {
+      icon: "📅",
+      title: "No bookings yet",
+      message: "You haven't made any bookings. Find your perfect hotel and start your journey today.",
+      buttonText: "Book a Stay",
+      secondaryButton: null,
+    },
+  };
+
+  const currentEmptyState = emptyStates[activeTab as keyof typeof emptyStates];
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Empty States</Text>
+        <Text style={styles.headerSubtitle}>Elegant placeholder designs</Text>
+      </View>
+
+      {/* Tab Switcher */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === "hotels" && styles.tabActive]}
+          onPress={() => setActiveTab("hotels")}
+        >
+          <Text style={[styles.tabText, activeTab === "hotels" && styles.tabTextActive]}>
+            No Hotels
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === "wishlist" && styles.tabActive]}
+          onPress={() => setActiveTab("wishlist")}
+        >
+          <Text style={[styles.tabText, activeTab === "wishlist" && styles.tabTextActive]}>
+            No Wishlist
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === "bookings" && styles.tabActive]}
+          onPress={() => setActiveTab("bookings")}
+        >
+          <Text style={[styles.tabText, activeTab === "bookings" && styles.tabTextActive]}>
+            No Bookings
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Empty State Card */}
+        <View style={styles.emptyCard}>
+          {/* Illustration Placeholder */}
+          <View style={styles.illustrationContainer}>
+            <View style={styles.illustrationCircle}>
+              <Text style={styles.illustrationIcon}>{currentEmptyState.icon}</Text>
+            </View>
+          </View>
+
+          {/* Friendly Text */}
+          <Text style={styles.emptyTitle}>{currentEmptyState.title}</Text>
+          <Text style={styles.emptyMessage}>{currentEmptyState.message}</Text>
+
+          {/* CTA Button */}
+          <TouchableOpacity style={styles.primaryButton}>
+            <Text style={styles.primaryButtonText}>{currentEmptyState.buttonText}</Text>
+          </TouchableOpacity>
+
+          {/* Secondary Button (if available) */}
+          {currentEmptyState.secondaryButton && (
+            <TouchableOpacity style={styles.secondaryButton}>
+              <Text style={styles.secondaryButtonText}>{currentEmptyState.secondaryButton}</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Additional Info */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoTitle}>💡 Need help finding hotels?</Text>
+          <Text style={styles.infoText}>Try searching for popular destinations or check our recommendations</Text>
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  // Header
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    letterSpacing: -0.5,
+    marginBottom: 4,
+  },
+
+  headerSubtitle: {
+    fontSize: 14,
+    color: "#666666",
+    fontWeight: "400",
+  },
+
+  // Tab Switcher
+  tabContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 20,
+    gap: 12,
+  },
+
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+  },
+
+  tabActive: {
+    backgroundColor: "#1A1A1A",
+    borderColor: "#1A1A1A",
+  },
+
+  tabText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666666",
+  },
+
+  tabTextActive: {
+    color: "#FFFFFF",
+  },
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+  },
+
+  // Empty State Card
+  emptyCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 28,
+    padding: 32,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 5,
+    marginBottom: 20,
+  },
+
+  // Illustration
+  illustrationContainer: {
+    marginBottom: 24,
+  },
+
+  illustrationCircle: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: "#F5F5F5",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  illustrationIcon: {
+    fontSize: 64,
+  },
+
+  // Text
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 12,
+    textAlign: "center",
+    letterSpacing: -0.3,
+  },
+
+  emptyMessage: {
+    fontSize: 15,
+    color: "#666666",
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 28,
+    paddingHorizontal: 8,
+  },
+
+  // Buttons
+  primaryButton: {
+    backgroundColor: "#1A1A1A",
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderRadius: 16,
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  primaryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
+  secondaryButton: {
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderRadius: 16,
+    width: "100%",
+    alignItems: "center",
+  },
+
+  secondaryButtonText: {
+    color: "#1A1A1A",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
+  // Info Container
+  infoContainer: {
+    backgroundColor: "#F5F5F5",
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+  },
+
+  infoTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginBottom: 8,
+  },
+
+  infoText: {
+    fontSize: 13,
+    color: "#666666",
+    lineHeight: 18,
+  },
+
+  bottomSpacer: {
+    height: 20,
+  },
+});
