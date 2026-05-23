@@ -1,0 +1,579 @@
+import { useState } from "react";
+import {
+  Dimensions,
+  Image,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function PopularHotelsScreen() {
+  const [refreshing, setRefreshing] = useState(false);
+  const [likedHotels, setLikedHotels] = useState<string[]>([]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setRefreshing(false);
+  };
+
+  const toggleWishlist = (hotelId: string) => {
+    if (likedHotels.includes(hotelId)) {
+      setLikedHotels(likedHotels.filter(id => id !== hotelId));
+    } else {
+      setLikedHotels([...likedHotels, hotelId]);
+    }
+  };
+
+  // Premium Hotel Data
+  const popularHotels = [
+    {
+      id: "1",
+      name: "The Grand Plaza",
+      location: "Paris, France",
+      price: "₹24,999",
+      originalPrice: "₹35,999",
+      rating: "4.9",
+      reviewCount: "2,845",
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop",
+      discount: "30%",
+      featured: true,
+      coordinates: "48.8566° N, 2.3522° E",
+    },
+    {
+      id: "2",
+      name: "Royal Garden Resort",
+      location: "Bali, Indonesia",
+      price: "₹18,499",
+      originalPrice: "₹27,999",
+      rating: "4.8",
+      reviewCount: "1,932",
+      image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&h=800&fit=crop",
+      discount: "34%",
+      featured: false,
+      coordinates: "8.3405° S, 115.0920° E",
+    },
+    {
+      id: "3",
+      name: "Mountain Peak Lodge",
+      location: "Swiss Alps, Switzerland",
+      price: "₹32,999",
+      originalPrice: "₹49,999",
+      rating: "4.9",
+      reviewCount: "1,247",
+      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=1200&h=800&fit=crop",
+      discount: "34%",
+      featured: true,
+      coordinates: "46.8182° N, 8.2275° E",
+    },
+    {
+      id: "4",
+      name: "Ocean Paradise",
+      location: "Maldives",
+      price: "₹42,999",
+      originalPrice: "₹64,999",
+      rating: "5.0",
+      reviewCount: "3,421",
+      image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=1200&h=800&fit=crop",
+      discount: "34%",
+      featured: false,
+      coordinates: "1.9772° N, 73.5361° E",
+    },
+    {
+      id: "5",
+      name: "Desert Oasis Resort",
+      location: "Dubai, UAE",
+      price: "₹38,499",
+      originalPrice: "₹55,999",
+      rating: "4.8",
+      reviewCount: "2,156",
+      image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop",
+      discount: "31%",
+      featured: true,
+      coordinates: "25.2048° N, 55.2708° E",
+    },
+    {
+      id: "6",
+      name: "City Light Hotel",
+      location: "New York, USA",
+      price: "₹45,999",
+      originalPrice: "₹68,999",
+      rating: "4.7",
+      reviewCount: "4,823",
+      image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&h=800&fit=crop",
+      discount: "33%",
+      featured: false,
+      coordinates: "40.7128° N, 74.0060° W",
+    },
+  ];
+
+  const [hotels, setHotels] = useState(popularHotels);
+
+  const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const stars = [];
+    for (let i = 0; i < fullStars; i++) {
+      stars.push("★");
+    }
+    if (rating % 1 !== 0) {
+      stars.push("½");
+    }
+    return stars.join("");
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+      
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#000000"]} />
+        }
+      >
+        {/* Header Section */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Popular Hotels</Text>
+            <Text style={styles.subGreeting}>Handpicked for you ✨</Text>
+          </View>
+          <TouchableOpacity style={styles.filterButton}>
+            <Text style={styles.filterIconText}>⚙️</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Results Count */}
+        <View style={styles.resultsContainer}>
+          <Text style={styles.resultsText}>{hotels.length} luxury stays found</Text>
+          <TouchableOpacity>
+            <Text style={styles.sortText}>Sort by: Recommended ↓</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Popular Hotels List - Vertically Stacked */}
+        {hotels.map((hotel, index) => (
+          <TouchableOpacity 
+            key={hotel.id} 
+            activeOpacity={0.95} 
+            style={[
+              styles.hotelCard,
+              index === hotels.length - 1 && styles.lastCard
+            ]}
+          >
+            {/* Hotel Image Section */}
+            <View style={styles.imageContainer}>
+              <Image source={{ uri: hotel.image }} style={styles.hotelImage} />
+              
+              {/* Discount Badge */}
+              <View style={styles.discountBadge}>
+                <Text style={styles.discountText}>Save {hotel.discount}</Text>
+              </View>
+              
+              {/* Featured Badge */}
+              {hotel.featured && (
+                <View style={styles.featuredBadge}>
+                  <Text style={styles.featuredText}>✨ Featured</Text>
+                </View>
+              )}
+              
+              {/* Wishlist Heart Button - Overlay */}
+              <TouchableOpacity 
+                style={styles.wishlistButton}
+                onPress={() => toggleWishlist(hotel.id)}
+              >
+                <Text style={styles.wishlistIcon}>
+                  {likedHotels.includes(hotel.id) ? "❤️" : "🤍"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Hotel Information Section */}
+            <View style={styles.hotelInfoContainer}>
+              {/* Hotel Name and Rating Row */}
+              <View style={styles.nameRatingRow}>
+                <Text style={styles.hotelName}>{hotel.name}</Text>
+                <View style={styles.ratingContainer}>
+                  <Text style={styles.starIcon}>★</Text>
+                  <Text style={styles.ratingText}>{hotel.rating}</Text>
+                  <Text style={styles.reviewCount}>({hotel.reviewCount})</Text>
+                </View>
+              </View>
+
+              {/* Location */}
+              <View style={styles.locationContainer}>
+                <Text style={styles.locationIcon}>📍</Text>
+                <Text style={styles.locationText}>{hotel.location}</Text>
+              </View>
+
+              {/* Divider */}
+              <View style={styles.divider} />
+
+              {/* Price and CTA Row */}
+              <View style={styles.priceCTARow}>
+                <View style={styles.priceContainer}>
+                  <View style={styles.priceRow}>
+                    <Text style={styles.priceText}>{hotel.price}</Text>
+                    <Text style={styles.originalPriceText}>{hotel.originalPrice}</Text>
+                  </View>
+                  <Text style={styles.perNightText}>per night + taxes</Text>
+                </View>
+                
+                <TouchableOpacity style={styles.bookButton}>
+                  <Text style={styles.bookButtonText}>Book Now</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Additional Info */}
+              <View style={styles.additionalInfo}>
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoIcon}>🛏️</Text>
+                  <Text style={styles.infoText}>2 Beds</Text>
+                </View>
+                <View style={styles.infoDot} />
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoIcon}>👥</Text>
+                  <Text style={styles.infoText}>4 Guests</Text>
+                </View>
+                <View style={styles.infoDot} />
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoIcon}>🚿</Text>
+                  <Text style={styles.infoText}>2 Baths</Text>
+                </View>
+                <View style={styles.infoDot} />
+                <View style={styles.infoItem}>
+                  <Text style={styles.infoIcon}>📏</Text>
+                  <Text style={styles.infoText}>65m²</Text>
+                </View>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  // Header Styles
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+
+  greeting: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    letterSpacing: -0.5,
+  },
+
+  subGreeting: {
+    fontSize: 14,
+    color: "#666666",
+    marginTop: 4,
+    fontWeight: "400",
+  },
+
+  filterButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  filterIconText: {
+    fontSize: 20,
+  },
+
+  // Results Container
+  resultsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 20,
+  },
+
+  resultsText: {
+    fontSize: 13,
+    color: "#666666",
+    fontWeight: "500",
+  },
+
+  sortText: {
+    fontSize: 13,
+    color: "#000000",
+    fontWeight: "600",
+  },
+
+  // Hotel Card
+  hotelCard: {
+    marginHorizontal: 20,
+    marginBottom: 24,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 5,
+  },
+
+  lastCard: {
+    marginBottom: 0,
+  },
+
+  // Image Section
+  imageContainer: {
+    position: "relative",
+    width: "100%",
+    height: 260,
+  },
+
+  hotelImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+
+  discountBadge: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    backgroundColor: "#EF4444",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    zIndex: 2,
+  },
+
+  discountText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
+  featuredBadge: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    backgroundColor: "#000000",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    zIndex: 2,
+  },
+
+  featuredText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
+  wishlistButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255,255,255,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 2,
+  },
+
+  wishlistIcon: {
+    fontSize: 22,
+  },
+
+  // Hotel Info Container
+  hotelInfoContainer: {
+    padding: 18,
+  },
+
+  nameRatingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+
+  hotelName: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    letterSpacing: -0.3,
+    flex: 1,
+  },
+
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+  },
+
+  starIcon: {
+    fontSize: 13,
+    color: "#FFB800",
+    marginRight: 3,
+  },
+
+  ratingText: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginRight: 2,
+  },
+
+  reviewCount: {
+    fontSize: 11,
+    color: "#999999",
+  },
+
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+
+  locationIcon: {
+    fontSize: 14,
+    marginRight: 6,
+  },
+
+  locationText: {
+    fontSize: 14,
+    color: "#666666",
+    fontWeight: "400",
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: "#E5E5E5",
+    marginBottom: 16,
+  },
+
+  priceCTARow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+
+  priceContainer: {
+    flex: 1,
+  },
+
+  priceRow: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    marginBottom: 4,
+  },
+
+  priceText: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#1A1A1A",
+  },
+
+  originalPriceText: {
+    fontSize: 15,
+    color: "#999999",
+    textDecorationLine: "line-through",
+    marginLeft: 8,
+  },
+
+  perNightText: {
+    fontSize: 12,
+    color: "#999999",
+    fontWeight: "500",
+  },
+
+  bookButton: {
+    backgroundColor: "#1A1A1A",
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 16,
+    minWidth: 110,
+    alignItems: "center",
+  },
+
+  bookButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0.3,
+  },
+
+  additionalInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#F0F0F0",
+  },
+
+  infoItem: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  infoIcon: {
+    fontSize: 14,
+    marginRight: 4,
+  },
+
+  infoText: {
+    fontSize: 12,
+    color: "#666666",
+    fontWeight: "500",
+  },
+
+  infoDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#CCCCCC",
+    marginHorizontal: 10,
+  },
+
+  bottomSpacer: {
+    height: 30,
+  },
+});
