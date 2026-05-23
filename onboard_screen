@@ -1,0 +1,281 @@
+import { useRef, useState } from "react";
+import {
+  Dimensions,
+  FlatList,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function OnboardingScreen() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
+
+  const onboardingData = [
+    {
+      id: "1",
+      title: "Find Your Perfect Stay",
+      subtitle: "Discover handpicked luxury hotels curated just for you",
+      illustration: "🏨",
+      bgColor: "#FAFAFA",
+    },
+    {
+      id: "2",
+      title: "Book with Confidence",
+      subtitle: "Secure bookings, best price guarantee & 24/7 support",
+      illustration: "🔒",
+      bgColor: "#FAFAFA",
+    },
+    {
+      id: "3",
+      title: "Travel in Style",
+      subtitle: "Experience luxury stays at exclusive properties worldwide",
+      illustration: "✈️",
+      bgColor: "#FAFAFA",
+    },
+  ];
+
+  const handleNext = () => {
+    if (currentIndex < onboardingData.length - 1) {
+      flatListRef.current?.scrollToIndex({
+        index: currentIndex + 1,
+        animated: true,
+      });
+      setCurrentIndex(currentIndex + 1);
+    } else {
+      // Navigate to Home Screen (you can implement navigation here)
+      console.log("Navigate to Home");
+    }
+  };
+
+  const handleSkip = () => {
+    console.log("Skip to Home");
+  };
+
+  const renderItem = ({ item }: { item: typeof onboardingData[0] }) => (
+    <View style={styles.slideContainer}>
+      {/* Large Travel Illustration */}
+      <View style={styles.illustrationContainer}>
+        <View style={styles.illustrationCircle}>
+          <Text style={styles.illustrationText}>{item.illustration}</Text>
+        </View>
+      </View>
+
+      {/* Typography */}
+      <View style={styles.textContainer}>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.subtitle}>{item.subtitle}</Text>
+      </View>
+    </View>
+  );
+
+  const renderPagination = () => {
+    return (
+      <View style={styles.paginationContainer}>
+        {onboardingData.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.paginationDot,
+              currentIndex === index && styles.paginationDotActive,
+            ]}
+          />
+        ))}
+      </View>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+
+      {/* Skip Button */}
+      <TouchableOpacity style={styles.skipButton} onPress={handleSkip}>
+        <Text style={styles.skipText}>Skip</Text>
+      </TouchableOpacity>
+
+      {/* Onboarding Slides */}
+      <FlatList
+        ref={flatListRef}
+        data={onboardingData}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={(event) => {
+          const index = Math.round(event.nativeEvent.contentOffset.x / width);
+          setCurrentIndex(index);
+        }}
+        scrollEventThrottle={16}
+      />
+
+      {/* Bottom Section */}
+      <View style={styles.bottomContainer}>
+        {/* Pagination Dots */}
+        {renderPagination()}
+
+        {/* Next Button */}
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.nextButtonText}>
+            {currentIndex === onboardingData.length - 1 ? "Get Started" : "Next"}
+          </Text>
+          <Text style={styles.nextButtonArrow}>→</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  // Skip Button
+  skipButton: {
+    position: "absolute",
+    top: 16,
+    right: 20,
+    zIndex: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "#FFFFFF",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  skipText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#666666",
+  },
+
+  // Slide Container
+  slideContainer: {
+    width: width,
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 32,
+  },
+
+  // Illustration
+  illustrationContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 48,
+  },
+
+  illustrationCircle: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 20,
+    elevation: 6,
+  },
+
+  illustrationText: {
+    fontSize: 100,
+  },
+
+  // Text Container
+  textContainer: {
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    textAlign: "center",
+    marginBottom: 12,
+    letterSpacing: -0.5,
+  },
+
+  subtitle: {
+    fontSize: 16,
+    fontWeight: "400",
+    color: "#666666",
+    textAlign: "center",
+    lineHeight: 24,
+    letterSpacing: 0.2,
+  },
+
+  // Bottom Container
+  bottomContainer: {
+    position: "absolute",
+    bottom: 40,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+
+  // Pagination
+  paginationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#D1D1D1",
+    marginHorizontal: 6,
+  },
+
+  paginationDotActive: {
+    width: 24,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#1A1A1A",
+  },
+
+  // Next Button
+  nextButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1A1A1A",
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+
+  nextButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginRight: 8,
+  },
+
+  nextButtonArrow: {
+    fontSize: 18,
+    color: "#FFFFFF",
+  },
+});
