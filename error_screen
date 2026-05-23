@@ -1,0 +1,378 @@
+import { useState } from "react";
+import {
+  Dimensions,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function ErrorStateScreen() {
+  const [isRetrying, setIsRetrying] = useState(false);
+  const [activeError, setActiveError] = useState("network");
+
+  const errorTypes = {
+    network: {
+      icon: "📡",
+      title: "Connection Lost",
+      message: "Unable to connect to the internet. Please check your connection and try again.",
+      suggestion: "Check your Wi-Fi or mobile data settings",
+    },
+    server: {
+      icon: "🔄",
+      title: "Server Issue",
+      message: "Something went wrong on our end. We're working to fix it as soon as possible.",
+      suggestion: "Please try again in a few minutes",
+    },
+    search: {
+      icon: "🔍",
+      title: "Search Failed",
+      message: "We couldn't complete your search. This might be due to a temporary issue.",
+      suggestion: "Try refining your search or check back later",
+    },
+  };
+
+  const currentError = errorTypes[activeError as keyof typeof errorTypes];
+
+  const handleRetry = () => {
+    setIsRetrying(true);
+    setTimeout(() => {
+      setIsRetrying(false);
+      console.log("Retry attempted");
+    }, 1500);
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Error States</Text>
+        <Text style={styles.headerSubtitle}>Calm & helpful error messages</Text>
+      </View>
+
+      {/* Error Type Tabs */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeError === "network" && styles.tabActive]}
+          onPress={() => setActiveError("network")}
+        >
+          <Text style={[styles.tabText, activeError === "network" && styles.tabTextActive]}>
+            Network
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeError === "server" && styles.tabActive]}
+          onPress={() => setActiveError("server")}
+        >
+          <Text style={[styles.tabText, activeError === "server" && styles.tabTextActive]}>
+            Server
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeError === "search" && styles.tabActive]}
+          onPress={() => setActiveError("search")}
+        >
+          <Text style={[styles.tabText, activeError === "search" && styles.tabTextActive]}>
+            Search
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Error Card */}
+        <View style={styles.errorCard}>
+          {/* Error Illustration */}
+          <View style={styles.illustrationContainer}>
+            <View style={styles.illustrationCircle}>
+              <Text style={styles.illustrationIcon}>{currentError.icon}</Text>
+            </View>
+          </View>
+
+          {/* Error Title */}
+          <Text style={styles.errorTitle}>{currentError.title}</Text>
+
+          {/* Helpful Message */}
+          <Text style={styles.errorMessage}>{currentError.message}</Text>
+
+          {/* Suggestion */}
+          <View style={styles.suggestionContainer}>
+            <Text style={styles.suggestionIcon}>💡</Text>
+            <Text style={styles.suggestionText}>{currentError.suggestion}</Text>
+          </View>
+
+          {/* Retry Button */}
+          <TouchableOpacity
+            style={[styles.retryButton, isRetrying && styles.retryButtonDisabled]}
+            onPress={handleRetry}
+            disabled={isRetrying}
+          >
+            <Text style={styles.retryIcon}>↻</Text>
+            <Text style={styles.retryButtonText}>
+              {isRetrying ? "Trying again..." : "Try Again"}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Alternative Action */}
+          <TouchableOpacity style={styles.alternateButton}>
+            <Text style={styles.alternateButtonText}>Go to Homepage</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Help Tips */}
+        <View style={styles.tipsContainer}>
+          <Text style={styles.tipsTitle}>✨ Quick fixes to try</Text>
+          <View style={styles.tipItem}>
+            <Text style={styles.tipBullet}>•</Text>
+            <Text style={styles.tipText}>Check your internet connection</Text>
+          </View>
+          <View style={styles.tipItem}>
+            <Text style={styles.tipBullet}>•</Text>
+            <Text style={styles.tipText}>Restart the app and try again</Text>
+          </View>
+          <View style={styles.tipItem}>
+            <Text style={styles.tipBullet}>•</Text>
+            <Text style={styles.tipText}>Update to the latest version</Text>
+          </View>
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  // Header
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    letterSpacing: -0.5,
+    marginBottom: 4,
+  },
+
+  headerSubtitle: {
+    fontSize: 14,
+    color: "#666666",
+    fontWeight: "400",
+  },
+
+  // Tab Switcher
+  tabContainer: {
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 20,
+    gap: 12,
+  },
+
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+  },
+
+  tabActive: {
+    backgroundColor: "#1A1A1A",
+    borderColor: "#1A1A1A",
+  },
+
+  tabText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#666666",
+  },
+
+  tabTextActive: {
+    color: "#FFFFFF",
+  },
+
+  scrollContent: {
+    flexGrow: 1,
+    paddingHorizontal: 20,
+  },
+
+  // Error Card
+  errorCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 28,
+    padding: 32,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 5,
+    marginBottom: 20,
+  },
+
+  // Illustration
+  illustrationContainer: {
+    marginBottom: 24,
+  },
+
+  illustrationCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#F5F5F5",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  illustrationIcon: {
+    fontSize: 56,
+  },
+
+  // Error Text
+  errorTitle: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 12,
+    textAlign: "center",
+    letterSpacing: -0.3,
+  },
+
+  errorMessage: {
+    fontSize: 15,
+    color: "#666666",
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 20,
+    paddingHorizontal: 8,
+  },
+
+  // Suggestion
+  suggestionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 16,
+    marginBottom: 28,
+    width: "100%",
+  },
+
+  suggestionIcon: {
+    fontSize: 16,
+    marginRight: 10,
+  },
+
+  suggestionText: {
+    flex: 1,
+    fontSize: 13,
+    color: "#666666",
+    lineHeight: 18,
+  },
+
+  // Retry Button
+  retryButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#1A1A1A",
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderRadius: 16,
+    width: "100%",
+    marginBottom: 12,
+  },
+
+  retryButtonDisabled: {
+    opacity: 0.7,
+  },
+
+  retryIcon: {
+    fontSize: 18,
+    color: "#FFFFFF",
+    marginRight: 8,
+  },
+
+  retryButtonText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
+  // Alternate Button
+  alternateButton: {
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 28,
+    paddingVertical: 14,
+    borderRadius: 16,
+    width: "100%",
+    alignItems: "center",
+  },
+
+  alternateButtonText: {
+    color: "#1A1A1A",
+    fontSize: 15,
+    fontWeight: "600",
+  },
+
+  // Tips Container
+  tipsContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  tipsTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginBottom: 12,
+  },
+
+  tipItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+
+  tipBullet: {
+    fontSize: 16,
+    color: "#CCCCCC",
+    marginRight: 10,
+  },
+
+  tipText: {
+    fontSize: 13,
+    color: "#666666",
+    flex: 1,
+  },
+
+  bottomSpacer: {
+    height: 20,
+  },
+});
