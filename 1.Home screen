@@ -1,1 +1,764 @@
+import { useState } from "react";
+import {
+    Dimensions,
+    FlatList,
+    Image,
+    RefreshControl,
+    SafeAreaView,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
+const { width, height } = Dimensions.get("window");
+
+export default function HomeScreen() {
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("All");
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setRefreshing(false);
+  };
+
+  // Filter chips data
+  const filterChips = [
+    { id: "1", title: "All" },
+    { id: "2", title: "Price" },
+    { id: "3", title: "Rating" },
+    { id: "4", title: "Reviews" },
+    { id: "5", title: "Luxury" },
+  ];
+
+  // Featured cities data
+  const featuredCities = [
+    {
+      id: "1",
+      name: "Paris",
+      country: "France",
+      image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&h=600&fit=crop",
+      dates: "Sep 12-17",
+    },
+    {
+      id: "2",
+      name: "Maldives",
+      country: "Maldives",
+      image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&h=600&fit=crop",
+      dates: "Oct 5-12",
+    },
+    {
+      id: "3",
+      name: "Swiss Alps",
+      country: "Switzerland",
+      image: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&h=600&fit=crop",
+      dates: "Dec 20-25",
+    },
+  ];
+
+  // Hotel data
+  const hotels = [
+    {
+      id: "1",
+      name: "The Grand Plaza",
+      location: "Paris, France",
+      price: "₹24,999",
+      rating: "4.9",
+      reviews: "2,845",
+      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
+      isWishlisted: false,
+      featured: true,
+    },
+    {
+      id: "2",
+      name: "Royal Garden Resort",
+      location: "Bali, Indonesia",
+      price: "₹18,499",
+      rating: "4.8",
+      reviews: "1,932",
+      image: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=800&h=600&fit=crop",
+      isWishlisted: false,
+      featured: false,
+    },
+    {
+      id: "3",
+      name: "Mountain Peak Lodge",
+      location: "Swiss Alps",
+      price: "₹32,999",
+      rating: "4.9",
+      reviews: "1,247",
+      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&h=600&fit=crop",
+      isWishlisted: false,
+      featured: true,
+    },
+    {
+      id: "4",
+      name: "Ocean Paradise",
+      location: "Maldives",
+      price: "₹42,999",
+      rating: "5.0",
+      reviews: "3,421",
+      image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&h=600&fit=crop",
+      isWishlisted: false,
+      featured: false,
+    },
+  ];
+
+  const [hotelList, setHotelList] = useState(hotels);
+
+  const toggleWishlist = (hotelId: string) => {
+    setHotelList(prev =>
+      prev.map(hotel =>
+        hotel.id === hotelId ? { ...hotel, isWishlisted: !hotel.isWishlisted } : hotel
+      )
+    );
+  };
+
+  const renderCityCard = ({ item }: { item: typeof featuredCities[0] }) => (
+    <TouchableOpacity activeOpacity={0.9} style={styles.cityCard}>
+      <Image source={{ uri: item.image }} style={styles.cityImage} />
+      <View style={styles.cityOverlay}>
+        <Text style={styles.cityName}>{item.name}</Text>
+        <Text style={styles.cityCountry}>{item.country}</Text>
+        <View style={styles.cityDateBadge}>
+          <Text style={styles.cityDateText}>{item.dates}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderHotelCard = ({ item }: { item: typeof hotels[0] }) => (
+    <TouchableOpacity activeOpacity={0.95} style={styles.hotelCard}>
+      <View style={styles.hotelImageContainer}>
+        <Image source={{ uri: item.image }} style={styles.hotelImage} />
+        <TouchableOpacity 
+          style={styles.wishlistButton}
+          onPress={() => toggleWishlist(item.id)}
+        >
+          <Text style={styles.wishlistIcon}>{item.isWishlisted ? "❤️" : "🤍"}</Text>
+        </TouchableOpacity>
+        {item.featured && (
+          <View style={styles.featuredBadge}>
+            <Text style={styles.featuredText}>Featured</Text>
+          </View>
+        )}
+      </View>
+      
+      <View style={styles.hotelContent}>
+        <View style={styles.hotelHeader}>
+          <Text style={styles.hotelName}>{item.name}</Text>
+          <View style={styles.ratingContainer}>
+            <Text style={styles.starIcon}>★</Text>
+            <Text style={styles.ratingText}>{item.rating}</Text>
+            <Text style={styles.reviewCount}>({item.reviews})</Text>
+          </View>
+        </View>
+        
+        <View style={styles.locationContainer}>
+          <Text style={styles.locationIcon}>📍</Text>
+          <Text style={styles.locationText}>{item.location}</Text>
+        </View>
+        
+        <View style={styles.priceContainer}>
+          <Text style={styles.priceText}>{item.price}</Text>
+          <Text style={styles.perNightText}>/ night</Text>
+        </View>
+        
+        <TouchableOpacity style={styles.bookButton}>
+          <Text style={styles.bookButtonText}>View Details</Text>
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+      
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#000000"]} />
+        }
+      >
+        {/* Header Section */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.greeting}>Good morning,</Text>
+            <Text style={styles.userName}>Traveler ✨</Text>
+          </View>
+          <TouchableOpacity style={styles.notificationButton}>
+            <Text style={styles.notificationIcon}>🔔</Text>
+            <View style={styles.notificationDot} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Search Bar */}
+        <View style={styles.searchWrapper}>
+          <View style={styles.searchContainer}>
+            <Text style={styles.searchIcon}>🔍</Text>
+            <TextInput
+              placeholder="Search destinations, hotels..."
+              placeholderTextColor="#A0A0A0"
+              style={styles.searchInput}
+            />
+            <TouchableOpacity style={styles.filterIconButton}>
+              <Text style={styles.filterIconText}>⚙️</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Filter Chips */}
+        <View style={styles.chipsContainer}>
+          <FlatList
+            horizontal
+            data={filterChips}
+            keyExtractor={(item) => item.id}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chipsList}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={[
+                  styles.chip,
+                  selectedFilter === item.title && styles.chipActive,
+                ]}
+                onPress={() => setSelectedFilter(item.title)}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    selectedFilter === item.title && styles.chipTextActive,
+                  ]}
+                >
+                  {item.title}
+                </Text>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+
+        {/* Featured Destinations Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Featured Destinations</Text>
+          <TouchableOpacity>
+            <Text style={styles.seeAllText}>See all →</Text>
+          </TouchableOpacity>
+        </View>
+
+        <FlatList
+          horizontal
+          data={featuredCities}
+          keyExtractor={(item) => item.id}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.citiesList}
+          renderItem={renderCityCard}
+        />
+
+        {/* Popular Hotels Section */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Popular Stays</Text>
+          <TouchableOpacity>
+            <Text style={styles.seeAllText}>See all →</Text>
+          </TouchableOpacity>
+        </View>
+
+        <FlatList
+          horizontal
+          data={hotelList}
+          keyExtractor={(item) => item.id}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.hotelsList}
+          renderItem={renderHotelCard}
+        />
+
+        {/* Recent Search Section */}
+        <View style={styles.recentSection}>
+          <Text style={styles.recentTitle}>Recently Viewed</Text>
+          
+          <TouchableOpacity style={styles.recentCard}>
+            <Image 
+              source={{ uri: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop" }}
+              style={styles.recentImage}
+            />
+            <View style={styles.recentContent}>
+              <Text style={styles.recentHotelName}>The Grand Plaza</Text>
+              <Text style={styles.recentLocation}>Paris, France</Text>
+              <Text style={styles.recentPrice}>₹24,999 / night</Text>
+            </View>
+            <TouchableOpacity style={styles.recentBookButton}>
+              <Text style={styles.recentBookText}>Book</Text>
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  // Header Styles
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+
+  greeting: {
+    fontSize: 14,
+    color: "#666666",
+    fontWeight: "400",
+    letterSpacing: 0.3,
+  },
+
+  userName: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginTop: 4,
+    letterSpacing: -0.5,
+  },
+
+  notificationButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  notificationIcon: {
+    fontSize: 22,
+  },
+
+  notificationDot: {
+    position: "absolute",
+    top: 12,
+    right: 12,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#000000",
+    borderWidth: 1.5,
+    borderColor: "#FFFFFF",
+  },
+
+  // Search Styles
+  searchWrapper: {
+    paddingHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 24,
+  },
+
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 50,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 3,
+  },
+
+  searchIcon: {
+    fontSize: 18,
+    marginRight: 12,
+    color: "#999999",
+  },
+
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: "#1A1A1A",
+    fontWeight: "400",
+  },
+
+  filterIconButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#1A1A1A",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  filterIconText: {
+    fontSize: 18,
+    color: "#FFFFFF",
+  },
+
+  // Filter Chips
+  chipsContainer: {
+    marginBottom: 28,
+  },
+
+  chipsList: {
+    paddingLeft: 20,
+    paddingRight: 12,
+  },
+
+  chip: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 30,
+    backgroundColor: "#FFFFFF",
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+  },
+
+  chipActive: {
+    backgroundColor: "#1A1A1A",
+    borderColor: "#1A1A1A",
+  },
+
+  chipText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#666666",
+  },
+
+  chipTextActive: {
+    color: "#FFFFFF",
+  },
+
+  // Section Header
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    marginBottom: 18,
+  },
+
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    letterSpacing: -0.3,
+  },
+
+  seeAllText: {
+    fontSize: 13,
+    color: "#000000",
+    fontWeight: "500",
+  },
+
+  // Featured Cities
+  citiesList: {
+    paddingLeft: 20,
+    paddingRight: 12,
+    marginBottom: 32,
+  },
+
+  cityCard: {
+    width: width * 0.65,
+    height: 200,
+    borderRadius: 24,
+    marginRight: 16,
+    overflow: "hidden",
+    position: "relative",
+  },
+
+  cityImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+
+  cityOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    backgroundColor: "rgba(0,0,0,0.3)",
+  },
+
+  cityName: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginBottom: 2,
+  },
+
+  cityCountry: {
+    fontSize: 13,
+    color: "#F5F5F5",
+    marginBottom: 8,
+    fontWeight: "400",
+  },
+
+  cityDateBadge: {
+    backgroundColor: "rgba(255,255,255,0.2)",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+  },
+
+  cityDateText: {
+    fontSize: 11,
+    color: "#FFFFFF",
+    fontWeight: "500",
+  },
+
+  // Hotel Cards
+  hotelsList: {
+    paddingLeft: 20,
+    paddingRight: 12,
+    marginBottom: 32,
+  },
+
+  hotelCard: {
+    width: width * 0.75,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    marginRight: 16,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 5,
+  },
+
+  hotelImageContainer: {
+    position: "relative",
+  },
+
+  hotelImage: {
+    width: "100%",
+    height: 200,
+    resizeMode: "cover",
+  },
+
+  wishlistButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "rgba(255,255,255,0.95)",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+
+  wishlistIcon: {
+    fontSize: 20,
+  },
+
+  featuredBadge: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    backgroundColor: "#000000",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+
+  featuredText: {
+    color: "#FFFFFF",
+    fontSize: 11,
+    fontWeight: "600",
+    letterSpacing: 0.5,
+  },
+
+  hotelContent: {
+    padding: 18,
+  },
+
+  hotelHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+
+  hotelName: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    flex: 1,
+  },
+
+  ratingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+
+  starIcon: {
+    fontSize: 12,
+    color: "#FFB800",
+    marginRight: 3,
+  },
+
+  ratingText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginRight: 2,
+  },
+
+  reviewCount: {
+    fontSize: 11,
+    color: "#999999",
+  },
+
+  locationContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  locationIcon: {
+    fontSize: 12,
+    marginRight: 4,
+  },
+
+  locationText: {
+    fontSize: 13,
+    color: "#666666",
+    fontWeight: "400",
+  },
+
+  priceContainer: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    marginBottom: 16,
+  },
+
+  priceText: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#1A1A1A",
+  },
+
+  perNightText: {
+    fontSize: 12,
+    color: "#999999",
+    marginLeft: 4,
+  },
+
+  bookButton: {
+    backgroundColor: "#1A1A1A",
+    paddingVertical: 12,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+
+  bookButtonText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "600",
+    letterSpacing: 0.3,
+  },
+
+  // Recent Section
+  recentSection: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+
+  recentTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 16,
+  },
+
+  recentCard: {
+    flexDirection: "row",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 12,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  recentImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 16,
+    resizeMode: "cover",
+  },
+
+  recentContent: {
+    flex: 1,
+    marginLeft: 12,
+  },
+
+  recentHotelName: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 2,
+  },
+
+  recentLocation: {
+    fontSize: 12,
+    color: "#666666",
+    marginBottom: 4,
+  },
+
+  recentPrice: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1A1A1A",
+  },
+
+  recentBookButton: {
+    backgroundColor: "#1A1A1A",
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+
+  recentBookText: {
+    color: "#FFFFFF",
+    fontSize: 13,
+    fontWeight: "600",
+  },
+
+  bottomSpacer: {
+    height: 20,
+  },
+});
