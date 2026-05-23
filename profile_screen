@@ -1,0 +1,478 @@
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  StatusBar,
+  ScrollView,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  Alert,
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function ProfileScreen() {
+  const [user, setUser] = useState({
+    name: "Souvik Das",
+    email: "souvik@stayluxe.com",
+    phone: "+91 98765 43210",
+    memberSince: "March 2024",
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+  });
+
+  const menuItems = [
+    {
+      id: "1",
+      title: "My Bookings",
+      icon: "📅",
+      count: "3",
+      color: "#1A1A1A",
+    },
+    {
+      id: "2",
+      title: "Wishlist",
+      icon: "❤️",
+      count: "4",
+      color: "#1A1A1A",
+    },
+    {
+      id: "3",
+      title: "Settings",
+      icon: "⚙️",
+      count: null,
+      color: "#1A1A1A",
+    },
+    {
+      id: "4",
+      title: "Payment Methods",
+      icon: "💳",
+      count: null,
+      color: "#1A1A1A",
+    },
+    {
+      id: "5",
+      title: "Help Center",
+      icon: "❓",
+      count: null,
+      color: "#1A1A1A",
+    },
+  ];
+
+  const handleEditProfile = () => {
+    console.log("Edit Profile");
+  };
+
+  const handleMenuItem = (title: string) => {
+    console.log(`Navigate to ${title}`);
+  };
+
+  const handleLogout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: () => {
+            console.log("User Logged Out");
+          },
+        },
+      ]
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Profile</Text>
+        </View>
+
+        {/* Profile Card */}
+        <View style={styles.profileCard}>
+          {/* Avatar Section */}
+          <View style={styles.avatarSection}>
+            <Image source={{ uri: user.avatar }} style={styles.avatar} />
+            <TouchableOpacity style={styles.editAvatarButton}>
+              <Text style={styles.editAvatarIcon}>✎</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* User Info */}
+          <View style={styles.userInfo}>
+            <Text style={styles.userName}>{user.name}</Text>
+            <Text style={styles.userEmail}>{user.email}</Text>
+            <Text style={styles.userPhone}>{user.phone}</Text>
+            <View style={styles.memberBadge}>
+              <Text style={styles.memberText}>Member since {user.memberSince}</Text>
+            </View>
+          </View>
+
+          {/* Edit Profile Button */}
+          <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
+            <Text style={styles.editButtonText}>Edit Profile</Text>
+            <Text style={styles.editIcon}>→</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Stats Section */}
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statLabel}>Total Stays</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>₹45.2k</Text>
+            <Text style={styles.statLabel}>Total Spent</Text>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statCard}>
+            <Text style={styles.statNumber}>4.9</Text>
+            <Text style={styles.statLabel}>Avg Rating</Text>
+          </View>
+        </View>
+
+        {/* Menu Section */}
+        <View style={styles.menuContainer}>
+          <Text style={styles.menuSectionTitle}>Account</Text>
+          
+          {menuItems.map((item, index) => (
+            <TouchableOpacity
+              key={item.id}
+              style={[
+                styles.menuItem,
+                index === menuItems.length - 1 && styles.lastMenuItem,
+              ]}
+              onPress={() => handleMenuItem(item.title)}
+            >
+              <View style={styles.menuLeft}>
+                <Text style={styles.menuIcon}>{item.icon}</Text>
+                <Text style={styles.menuTitle}>{item.title}</Text>
+              </View>
+              <View style={styles.menuRight}>
+                {item.count && (
+                  <View style={styles.countBadge}>
+                    <Text style={styles.countText}>{item.count}</Text>
+                  </View>
+                )}
+                <Text style={styles.chevron}>›</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Logout Button */}
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutIcon}>↪</Text>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+
+        {/* App Version */}
+        <View style={styles.versionContainer}>
+          <Text style={styles.versionText}>StayLuxe App v1.0.0</Text>
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  // Header
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    letterSpacing: -0.5,
+  },
+
+  // Profile Card
+  profileCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    marginHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 20,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+
+  avatarSection: {
+    alignItems: "center",
+    marginBottom: 16,
+    position: "relative",
+  },
+
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#F5F5F5",
+  },
+
+  editAvatarButton: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#1A1A1A",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "#FFFFFF",
+  },
+
+  editAvatarIcon: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    fontWeight: "600",
+  },
+
+  userInfo: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+
+  userName: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#1A1A1A",
+    marginBottom: 4,
+    letterSpacing: -0.3,
+  },
+
+  userEmail: {
+    fontSize: 14,
+    color: "#666666",
+    marginBottom: 2,
+  },
+
+  userPhone: {
+    fontSize: 14,
+    color: "#666666",
+    marginBottom: 8,
+  },
+
+  memberBadge: {
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 4,
+  },
+
+  memberText: {
+    fontSize: 11,
+    color: "#999999",
+    fontWeight: "500",
+  },
+
+  editButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F5F5F5",
+    paddingVertical: 12,
+    borderRadius: 16,
+    marginTop: 4,
+  },
+
+  editButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginRight: 6,
+  },
+
+  editIcon: {
+    fontSize: 16,
+    color: "#1A1A1A",
+  },
+
+  // Stats Section
+  statsContainer: {
+    flexDirection: "row",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    paddingVertical: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  statCard: {
+    flex: 1,
+    alignItems: "center",
+  },
+
+  statNumber: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    marginBottom: 4,
+  },
+
+  statLabel: {
+    fontSize: 11,
+    color: "#999999",
+    fontWeight: "500",
+  },
+
+  statDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: "#E5E5E5",
+    alignSelf: "center",
+  },
+
+  // Menu Section
+  menuContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  menuSectionTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#999999",
+    letterSpacing: 0.5,
+    marginTop: 12,
+    marginBottom: 8,
+    paddingHorizontal: 4,
+  },
+
+  menuItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+
+  lastMenuItem: {
+    borderBottomWidth: 0,
+  },
+
+  menuLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  menuIcon: {
+    fontSize: 22,
+    marginRight: 14,
+  },
+
+  menuTitle: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#1A1A1A",
+  },
+
+  menuRight: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  countBadge: {
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginRight: 10,
+  },
+
+  countText: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#1A1A1A",
+  },
+
+  chevron: {
+    fontSize: 20,
+    color: "#CCCCCC",
+    fontWeight: "500",
+  },
+
+  // Logout Button
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    paddingVertical: 16,
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+  },
+
+  logoutIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+
+  logoutText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#EF4444",
+  },
+
+  // Version
+  versionContainer: {
+    alignItems: "center",
+    marginBottom: 16,
+  },
+
+  versionText: {
+    fontSize: 11,
+    color: "#CCCCCC",
+    fontWeight: "500",
+  },
+
+  bottomSpacer: {
+    height: 20,
+  },
+});
