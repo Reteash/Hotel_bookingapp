@@ -1,0 +1,485 @@
+import { useState } from "react";
+import {
+  Dimensions,
+  Image,
+  RefreshControl,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
+
+export default function ReviewsScreen() {
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("All");
+
+  const filters = ["All", "5 Star", "4 Star", "3 Star", "2 Star", "1 Star"];
+
+  const reviews = [
+    {
+      id: "1",
+      userName: "Sarah Johnson",
+      userAvatar: "https://randomuser.me/api/portraits/women/1.jpg",
+      rating: 5,
+      date: "March 15, 2024",
+      comment: "Absolutely incredible experience! The staff went above and beyond to make our stay memorable. The views of the Eiffel Tower from our room were breathtaking. Highly recommend the breakfast buffet!",
+      helpful: 128,
+    },
+    {
+      id: "2",
+      userName: "Michael Chen",
+      userAvatar: "https://randomuser.me/api/portraits/men/2.jpg",
+      rating: 5,
+      date: "February 28, 2024",
+      comment: "Exceptional service and luxurious accommodations. The location is perfect for exploring Paris. The spa treatments were world-class. Will definitely return!",
+      helpful: 94,
+    },
+    {
+      id: "3",
+      userName: "Emma Williams",
+      userAvatar: "https://randomuser.me/api/portraits/women/3.jpg",
+      rating: 4,
+      date: "February 10, 2024",
+      comment: "A wonderful stay! The room was spacious and beautifully decorated. Only minor issue was the wifi speed, but everything else was perfect. The rooftop bar offers amazing sunset views.",
+      helpful: 67,
+    },
+    {
+      id: "4",
+      userName: "David Kumar",
+      userAvatar: "https://randomuser.me/api/portraits/men/4.jpg",
+      rating: 5,
+      date: "January 22, 2024",
+      comment: "Best hotel experience ever! From check-in to check-out, everything was flawless. The concierge helped us plan our entire Paris itinerary. Can't wait to come back!",
+      helpful: 156,
+    },
+    {
+      id: "5",
+      userName: "Lisa Anderson",
+      userAvatar: "https://randomuser.me/api/portraits/women/5.jpg",
+      rating: 4,
+      date: "January 5, 2024",
+      comment: "Beautiful hotel with excellent amenities. The pool and spa were fantastic. Room service was prompt and delicious. Would definitely stay here again.",
+      helpful: 43,
+    },
+  ];
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setRefreshing(false);
+  };
+
+  const renderStars = (rating: number) => {
+    const stars = [];
+    for (let i = 0; i < 5; i++) {
+      stars.push(i < rating ? "★" : "☆");
+    }
+    return stars.join("");
+  };
+
+  const averageRating = 4.8;
+  const totalReviews = reviews.length;
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#FAFAFA" translucent={false} />
+
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton}>
+          <Text style={styles.backIcon}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Guest Reviews</Text>
+        <View style={styles.placeholder} />
+      </View>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#1A1A1A"]} />
+        }
+      >
+        {/* Rating Summary Card */}
+        <View style={styles.ratingSummaryCard}>
+          <View style={styles.ratingLeft}>
+            <Text style={styles.averageRating}>{averageRating}</Text>
+            <View style={styles.starsContainer}>
+              <Text style={styles.starsText}>{renderStars(Math.floor(averageRating))}</Text>
+            </View>
+            <Text style={styles.totalReviews}>Based on {totalReviews} reviews</Text>
+          </View>
+
+          <View style={styles.ratingRight}>
+            <View style={styles.ratingBarItem}>
+              <Text style={styles.ratingLabel}>5 ★</Text>
+              <View style={styles.ratingBar}>
+                <View style={[styles.ratingFill, { width: "85%" }]} />
+              </View>
+              <Text style={styles.ratingPercent}>85%</Text>
+            </View>
+            <View style={styles.ratingBarItem}>
+              <Text style={styles.ratingLabel}>4 ★</Text>
+              <View style={styles.ratingBar}>
+                <View style={[styles.ratingFill, { width: "12%" }]} />
+              </View>
+              <Text style={styles.ratingPercent}>12%</Text>
+            </View>
+            <View style={styles.ratingBarItem}>
+              <Text style={styles.ratingLabel}>3 ★</Text>
+              <View style={styles.ratingBar}>
+                <View style={[styles.ratingFill, { width: "2%" }]} />
+              </View>
+              <Text style={styles.ratingPercent}>2%</Text>
+            </View>
+            <View style={styles.ratingBarItem}>
+              <Text style={styles.ratingLabel}>2 ★</Text>
+              <View style={styles.ratingBar}>
+                <View style={[styles.ratingFill, { width: "1%" }]} />
+              </View>
+              <Text style={styles.ratingPercent}>1%</Text>
+            </View>
+            <View style={styles.ratingBarItem}>
+              <Text style={styles.ratingLabel}>1 ★</Text>
+              <View style={styles.ratingBar}>
+                <View style={[styles.ratingFill, { width: "0%" }]} />
+              </View>
+              <Text style={styles.ratingPercent}>0%</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Filter Chips */}
+        <View style={styles.filterContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {filters.map((filter) => (
+              <TouchableOpacity
+                key={filter}
+                style={[
+                  styles.filterChip,
+                  selectedFilter === filter && styles.filterChipActive,
+                ]}
+                onPress={() => setSelectedFilter(filter)}
+              >
+                <Text
+                  style={[
+                    styles.filterText,
+                    selectedFilter === filter && styles.filterTextActive,
+                  ]}
+                >
+                  {filter}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Reviews List */}
+        <View style={styles.reviewsContainer}>
+          {reviews.map((review, index) => (
+            <View
+              key={review.id}
+              style={[
+                styles.reviewCard,
+                index === reviews.length - 1 && styles.lastCard,
+              ]}
+            >
+              {/* User Header */}
+              <View style={styles.reviewHeader}>
+                <Image source={{ uri: review.userAvatar }} style={styles.userAvatar} />
+                <View style={styles.userInfo}>
+                  <Text style={styles.userName}>{review.userName}</Text>
+                  <View style={styles.ratingDateRow}>
+                    <View style={styles.userRating}>
+                      <Text style={styles.userStars}>{renderStars(review.rating)}</Text>
+                    </View>
+                    <Text style={styles.reviewDate}>{review.date}</Text>
+                  </View>
+                </View>
+              </View>
+
+              {/* Review Comment */}
+              <Text style={styles.reviewComment}>{review.comment}</Text>
+
+              {/* Helpful Button */}
+              <TouchableOpacity style={styles.helpfulButton}>
+                <Text style={styles.helpfulIcon}>👍</Text>
+                <Text style={styles.helpfulText}>Helpful ({review.helpful})</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FAFAFA",
+  },
+
+  // Header
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+
+  backButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  backIcon: {
+    fontSize: 24,
+    color: "#1A1A1A",
+  },
+
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1A1A1A",
+  },
+
+  placeholder: {
+    width: 44,
+  },
+
+  // Rating Summary Card
+  ratingSummaryCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    marginHorizontal: 20,
+    marginTop: 8,
+    marginBottom: 20,
+    padding: 20,
+    flexDirection: "row",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 4,
+  },
+
+  ratingLeft: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRightWidth: 1,
+    borderRightColor: "#E5E5E5",
+  },
+
+  averageRating: {
+    fontSize: 48,
+    fontWeight: "800",
+    color: "#1A1A1A",
+    marginBottom: 8,
+  },
+
+  starsContainer: {
+    marginBottom: 8,
+  },
+
+  starsText: {
+    fontSize: 16,
+    color: "#FFB800",
+    letterSpacing: 2,
+  },
+
+  totalReviews: {
+    fontSize: 12,
+    color: "#999999",
+  },
+
+  ratingRight: {
+    flex: 1.5,
+    paddingLeft: 20,
+    justifyContent: "center",
+  },
+
+  ratingBarItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+
+  ratingLabel: {
+    width: 40,
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#666666",
+  },
+
+  ratingBar: {
+    flex: 1,
+    height: 6,
+    backgroundColor: "#F0F0F0",
+    borderRadius: 3,
+    marginHorizontal: 10,
+    overflow: "hidden",
+  },
+
+  ratingFill: {
+    height: "100%",
+    backgroundColor: "#1A1A1A",
+    borderRadius: 3,
+  },
+
+  ratingPercent: {
+    width: 35,
+    fontSize: 11,
+    color: "#999999",
+    fontWeight: "500",
+  },
+
+  // Filter Chips
+  filterContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+
+  filterChip: {
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: "#E5E5E5",
+  },
+
+  filterChipActive: {
+    backgroundColor: "#1A1A1A",
+    borderColor: "#1A1A1A",
+  },
+
+  filterText: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: "#666666",
+  },
+
+  filterTextActive: {
+    color: "#FFFFFF",
+  },
+
+  // Reviews Container
+  reviewsContainer: {
+    paddingHorizontal: 20,
+  },
+
+  reviewCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+
+  lastCard: {
+    marginBottom: 0,
+  },
+
+  // Review Header
+  reviewHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+
+  userAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    marginRight: 14,
+  },
+
+  userInfo: {
+    flex: 1,
+  },
+
+  userName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1A1A1A",
+    marginBottom: 4,
+  },
+
+  ratingDateRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  userRating: {
+    marginRight: 10,
+  },
+
+  userStars: {
+    fontSize: 12,
+    color: "#FFB800",
+    letterSpacing: 1,
+  },
+
+  reviewDate: {
+    fontSize: 11,
+    color: "#999999",
+  },
+
+  // Review Comment
+  reviewComment: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: "#666666",
+    marginBottom: 14,
+  },
+
+  // Helpful Button
+  helpfulButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+
+  helpfulIcon: {
+    fontSize: 12,
+    marginRight: 6,
+  },
+
+  helpfulText: {
+    fontSize: 11,
+    fontWeight: "500",
+    color: "#666666",
+  },
+
+  bottomSpacer: {
+    height: 30,
+  },
+});
